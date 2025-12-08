@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use FedaPay\FedaPay;
+use FedaPay\Transaction;
+
+class PaiementController extends Controller
+{
+    /**
+     * Initialiser un paiement avec FedaPay
+     */
+    public function initier(Request $request)
+    {
+        $request->validate([
+            'montant' => 'required|numeric',
+            'type_abonnement' => 'required|string' // mensuel, annuel, etc.
+        ]);
+
+        // Initialiser FedaPay avec votre clé
+        FedaPay::setApiKey(config('services.fedapay.secret_key'));
+        FedaPay::setEnvironment('sandbox'); // ou 'live' en production
+
+        try {
+            // Créer la transaction
+            $transaction = Transaction::create([
+                'description' => 'Abonnement ' . $request->type_abonnement,
+                'amount' => $request->montant,
+                'currency' => ['iso' => 'XOF'],
+                'callback_url' => route('paiement.callback'),
+                'customer' => [
+                    'firstname' => Auth::user()->prenom,
+                    'lastname' => Auth::user()->nom,
+                    'email' => Auth::user()->email,
+                    'phone_number' => [
+                        'number' => Auth::user()->telephone ?? '00000000',
+                        'country' => 'bj'
+                    ]
+                ]
+            ]);
+
+            // Générer le token pour le paiement
+            $token = $transaction->generateToken();
+
+            // Sauvegarder la transaction temporairement
+            session(['transaction_id' => $transaction->id]);
+            session(['type_abonnement' => $request->type_abonnement]);
+
+            // Rediriger vers la page de paiement FedaPay
+            return redirect($token->url);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de l\'initialisation du paiement: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Callback après paiement
+     */
+    public function callback(Request $request)
+    {
+        $transactionId = session('transaction_id');
+        $typeAbonnement = session('type_abonnement');
+
+        if (!$transactionId) {
+            return redirect('/contenus')->with('error', 'Session de paiement invalide.');
+        }
+
+        // Vérifier le statut de la transaction
+        FedaPay::setApiKey(config('services.fedapay.secret_key'));
+
+        try {
+            $transaction = Transaction::retrieve($transactionId);
+
+            if ($transaction->status === 'approved') {
+                // Mettre à jour l'utilisateur
+                $user = Auth::user();
+
+                // Calculer la date d'expiration
+                $expiration = now();
+                if ($typeAbonnement === 'mensuel') {
+                    $expiration = now()->addMonth();
+                } elseif ($typeAbonnement === 'annuel') {
+                    $expiration = now()->addYear();
+                }
+
+                // Mettre à jour l'abonnement
+                $user->abonnement_valide = true;
+                $user->date_expiration_abonnement = $expiration;
+                $user->type_abonnement = $typeAbonnement;
+                $user->save();
+
+                // Nettoyer la session
+                session()->forget(['transaction_id', 'type_abonnement']);
+
+                return redirect('/contenus')->with('success', 'Paiement réussi! Votre abonnement est maintenant actif.');
+            } else {
+                return redirect('/contenus')->with('error', 'Paiement échoué ou annulé.');
+            }
+        } catch (\Exception $e) {
+            return redirect('/contenus')->with('error', 'Erreur lors de la vérification du paiement.');
+        }
+    }
+}
