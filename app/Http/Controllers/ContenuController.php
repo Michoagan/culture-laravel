@@ -6,7 +6,9 @@ use App\Models\Contenu;
 use App\Models\TypeContenu;
 use App\Models\Region;
 use App\Models\Langue;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContenuController extends Controller
 {
@@ -34,16 +36,15 @@ class ContenuController extends Controller
 
     // Les autres méthodes restent identiques...
     public function create()
-{
-    // Récupération des listes nécessaires pour les sélecteurs du formulaire
-    $typesContenu = TypeContenu::orderBy('nom')->get();
-    $regions      = Region::orderBy('nom_region')->get();
-    $langues      = Langue::orderBy('nom')->get();
+    {
+        // Récupération des listes nécessaires pour les sélecteurs du formulaire
+        $typesContenu = TypeContenu::orderBy('nom')->get();
+        $regions      = Region::orderBy('nom_region')->get();
+        $langues      = Langue::orderBy('nom_langue')->get();
 
-    // Retour de la vue avec les variables compactées
-    return view('contenus.create', compact('typesContenu', 'regions', 'langues'));
-}
-
+        // Retour de la vue avec les variables compactées
+        return view('contenus.create', compact('typesContenu', 'regions', 'langues'));
+    }
 
     public function store(Request $request)
     {
@@ -53,19 +54,21 @@ class ContenuController extends Controller
             'id_type_contenu' => 'required|exists:type_contenus,id',
             'id_region' => 'required|exists:regions,id',
             'id_langue' => 'required|exists:langues,id',
+            'statut' => 'required'
         ]);
 
-        $validated['id_auteur'];
+        // Champs gérés par le backend
+        $validated['id_auteur'] = Auth::id();
         $validated['date_creation'] = now();
-        $validated['statut'] = 'brouillon';
 
         Contenu::create($validated);
 
         return redirect()->route('contenus.index')
-                        ->with('success', 'Contenu créé avec succès!');
+            ->with('success', 'Contenu créé avec succès !');
     }
 
-     public function show($id)
+
+    public function show($id)
     {
         $contenu = Contenu::with([
             'typeContenu',
@@ -112,7 +115,7 @@ class ContenuController extends Controller
         $contenu->update($validated);
 
         return redirect()->route('contenus.index')
-                        ->with('success', 'Contenu mis à jour avec succès!');
+            ->with('success', 'Contenu mis à jour avec succès!');
     }
 
     public function destroy(Contenu $contenu)
@@ -120,6 +123,6 @@ class ContenuController extends Controller
         $contenu->delete();
 
         return redirect()->route('contenus.index')
-                        ->with('success', 'Contenu supprimé avec succès!');
+            ->with('success', 'Contenu supprimé avec succès!');
     }
 }

@@ -22,7 +22,7 @@
                 <h2 class="text-xl font-bold text-white">Nouveau contenu culturel</h2>
             </div>
 
-            <form action="{{ route('contenus.store') }}" method="POST" class="p-6 space-y-6">
+            <form action="{{route('contenus.store')}}" method="POST" class="p-6 space-y-6">
                 @csrf
 
                 <!-- Titre -->
@@ -157,7 +157,7 @@
                         </button>
                         
                         <button type="submit" 
-                                name="action" 
+                              
                                 value="publish"
                                 class="px-6 py-3 bg-benin-green text-white rounded-lg hover:bg-benin-dark-green transition-all duration-300 transform hover:scale-105 font-medium shadow-lg">
                             Publier le contenu

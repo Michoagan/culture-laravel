@@ -26,20 +26,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/contenus', [ContenuController::class, 'index'])->name('contenus.index');
     Route::get('/regions', [RegionController::class, 'index'])->name('regions.index');
     Route::get('/langues', [LangueController::class, 'index'])->name('langues.index');
-     Route::get('/contenus', [UserController::class, 'indexcontenus'])->name('users.index');
+    //  Route::get('/contenus', [UserController::class, 'indexcontenus'])->name('users.index');
 
     // Détails d'un contenu
-    Route::get('/contenus/{id}', [UserController::class, 'showcontenus'])->name('users.show');
+    // Route::get('/contenus/{id}', [UserController::class, 'showcontenus'])->name('users.show');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-     Route::get('/contenus', [ContenuController::class, 'index'])->name('contenus.index');
-Route::get('/contenus/create', [ContenuController::class, 'create'])->name('contenus.create');
+//      Route::get('/contenus', [ContenuController::class, 'index'])->name('contenus.index');
+// Route::get('/contenus/create', [ContenuController::class, 'create'])->name('contenus.create');
 
-    // Détails d'un contenu
-    Route::get('/contenus/{id}', [ContenuController::class, 'show'])->name('contenus.show');
+//     // Détails d'un contenu
+//     Route::get('/contenus/{id}', [ContenuController::class, 'show'])->name('contenus.show');
 
     // Ajouter un commentaire
     Route::post('/commentaires', [CommentaireController::class, 'store'])->name('commentaires.store');
