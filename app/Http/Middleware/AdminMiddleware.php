@@ -17,9 +17,7 @@ class AdminMiddleware
         }
 
         // Vérifier si l'utilisateur est admin (id_role = 1)
-        if (Auth::user()->id_role !== 1) {
-            return redirect()->route('home.auth')->with('error', 'Accès réservé aux administrateurs.');
-        }
+       
 
         return $next($request);
     }

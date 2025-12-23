@@ -38,7 +38,7 @@ class ContenuController extends Controller
     // Récupération des listes nécessaires pour les sélecteurs du formulaire
     $typesContenu = TypeContenu::orderBy('nom')->get();
     $regions      = Region::orderBy('nom_region')->get();
-    $langues      = Langue::orderBy('nom')->get();
+    $langues      = Langue::orderBy('nom_langue')->get();
 
     // Retour de la vue avec les variables compactées
     return view('contenus.create', compact('typesContenu', 'regions', 'langues'));
@@ -55,7 +55,7 @@ class ContenuController extends Controller
             'id_langue' => 'required|exists:langues,id',
         ]);
 
-        $validated['id_auteur'];
+         $validated['id_auteur'] = auth()->id();
         $validated['date_creation'] = now();
         $validated['statut'] = 'brouillon';
 

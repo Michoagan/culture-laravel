@@ -192,4 +192,37 @@ class UserController extends Controller
         // Vérifier si l'utilisateur a un abonnement actif
         return $user->abonnement_valide ?? false;
     }
+
+    // Ajoutez cette méthode dans UserController
+public function dashboard()
+{
+    $user = Auth::user();
+
+    // Statistiques personnelles
+    $stats = [
+        'contenus_lus' => 0,
+        'commentaires' => $user->commentaires()->count(),
+        'favoris' => 0,
+        'abonnement_valide' => $user->abonnement_valide,
+        'jours_restants' => $user->date_expiration_abonnement
+            ? max(0, now()->diffInDays($user->date_expiration_abonnement, false))
+            : 0
+    ];
+
+    // Contenus récents
+    $latestContents = Contenu::where('statut', 'publié')
+        ->with(['typeContenu', 'region', 'auteur'])
+        ->orderBy('created_at', 'desc')
+        ->take(6)
+        ->get();
+
+    // Commentaires récents de l'utilisateur
+    $myComments = $user->commentaires()
+        ->with('contenu')
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+
+    return view('dashboard', compact('user', 'stats', 'latestContents', 'myComments'));
+}
 }

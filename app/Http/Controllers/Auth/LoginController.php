@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
+
 
 class LoginController extends Controller
 {
@@ -16,44 +18,41 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+   public function login(Request $request)
 {
-    $request->validate([
+    $validated = $request->validate([
         'email' => ['required', 'email'],
         'mot_de_passe' => ['required', 'string'],
     ]);
 
-    // Auth::attempt attend la clé 'password' — on mappe mot_de_passe vers password
-    $credentials = [
-        'email' => $request->input('email'),
-        'password' => $request->input('mot_de_passe'),
-    ];
+    if (! Auth::attempt([
+        'email' => $validated['email'],
+        'password' => $validated['mot_de_passe'],
+    ], $request->boolean('remember'))) {
 
-    $remember = $request->boolean('remember', false);
-
-    if (Auth::attempt($credentials, $remember)) {
-        $request->session()->regenerate();
-
-        // Récupérer l'utilisateur connecté
-        $user = Auth::user();
-
-        // Redirection basée sur id_role
-        if ($user->id_role == 1) {
-            // Admin - id_role = 1
-            return redirect()->intended('/home-auth');
-        } elseif ($user->id_role == 2) {
-            // Utilisateur normal - id_role = 2
-            return redirect()->intended(route('users.index'));
-        } else {
-            // Par défaut pour d'autres rôles
-            return redirect()->intended('/dashboard');
-        }
+        throw ValidationException::withMessages([
+            'email' => __('Les identifiants fournis ne correspondent pas à nos enregistrements.'),
+        ]);
     }
 
-    throw ValidationException::withMessages([
-        'email' => __('Les identifiants fournis ne correspondent pas à nos enregistrements.'),
-    ]);
+    $request->session()->regenerate();
+
+    $user = Auth::user();
+
+    // 🔥 REDIRECTION CLAIRE PAR RÔLE
+    if ($user->id_role == 1) {
+        return redirect('/home-auth');
+    }
+
+    if ($user->id_role == 2) {
+        return redirect()->route('dashboard');
+    }
+
+    // Sécurité
+    Auth::logout();
+    return redirect('/login');
 }
+
 
     public function logout(Request $request)
     {

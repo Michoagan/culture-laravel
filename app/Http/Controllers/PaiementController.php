@@ -30,7 +30,7 @@ class PaiementController extends Controller
                 'description' => 'Abonnement ' . $request->type_abonnement,
                 'amount' => $request->montant,
                 'currency' => ['iso' => 'XOF'],
-                'callback_url' => route('paiement.callback'),
+                'callback_url' => route('paiement.initier'),
                 'customer' => [
                     'firstname' => Auth::user()->prenom,
                     'lastname' => Auth::user()->nom,
@@ -104,4 +104,16 @@ class PaiementController extends Controller
             return redirect('/contenus')->with('error', 'Erreur lors de la vérification du paiement.');
         }
     }
+
+    // Ajoutez cette méthode dans PaiementController
+public function abonnement()
+{
+    $user = Auth::user();
+
+    return view('abonnement.index', [
+        'user' => $user,
+        'abonnementActif' => $user->abonnement_valide ?? false,
+        'dateExpiration' => $user->date_expiration_abonnement ?? null
+    ]);
+}
 }
