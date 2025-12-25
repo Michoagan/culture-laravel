@@ -55,7 +55,6 @@
 
                 <form action="{{ route('paiement.initier') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="montant" value="5000">
                     <input type="hidden" name="type_abonnement" value="mensuel">
                     <button type="submit" class="w-full bg-benin-green hover:bg-benin-dark-green text-white font-bold py-3 px-4 rounded-lg transition-colors">
                         S'abonner maintenant
@@ -107,7 +106,6 @@
 
                 <form action="{{ route('paiement.initier') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="montant" value="48000">
                     <input type="hidden" name="type_abonnement" value="annuel">
                     <button type="submit" class="w-full bg-white hover:bg-gray-100 text-benin-green font-bold py-3 px-4 rounded-lg transition-colors">
                         Choisir cette offre
@@ -155,7 +153,6 @@
 
                 <form action="{{ route('paiement.initier') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="montant" value="3000">
                     <input type="hidden" name="type_abonnement" value="etudiant">
                     <button type="submit" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-3 px-4 rounded-lg transition-colors">
                         S'abonner

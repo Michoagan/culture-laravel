@@ -16,21 +16,29 @@ class PaiementController extends Controller
     public function initier(Request $request)
     {
         $request->validate([
-            'montant' => 'required|numeric',
-            'type_abonnement' => 'required|string' // mensuel, annuel, etc.
+            'type_abonnement' => 'required|string|in:mensuel,annuel,etudiant'
         ]);
+
+        // Définir les prix côté serveur (Plus sécurisé)
+        $prix = [
+            'mensuel' => 5000,
+            'annuel' => 48000,
+            'etudiant' => 3000
+        ];
+
+        $montant = $prix[$request->type_abonnement];
 
         // Initialiser FedaPay avec votre clé
         FedaPay::setApiKey(config('services.fedapay.secret_key'));
-        FedaPay::setEnvironment('sandbox'); // ou 'live' en production
+        FedaPay::setEnvironment(config('services.fedapay.mode', 'sandbox'));
 
         try {
             // Créer la transaction
             $transaction = Transaction::create([
-                'description' => 'Abonnement ' . $request->type_abonnement,
-                'amount' => $request->montant,
+                'description' => 'Abonnement ' . ucfirst($request->type_abonnement),
+                'amount' => $montant,
                 'currency' => ['iso' => 'XOF'],
-                'callback_url' => route('paiement.initier'),
+                'callback_url' => route('paiement.callback'),
                 'customer' => [
                     'firstname' => Auth::user()->prenom,
                     'lastname' => Auth::user()->nom,
@@ -62,7 +70,7 @@ class PaiementController extends Controller
      */
     public function callback(Request $request)
     {
-        $transactionId = session('transaction_id');
+        $transactionId = $request->input('id') ?? session('transaction_id');
         $typeAbonnement = session('type_abonnement');
 
         if (!$transactionId) {
@@ -71,6 +79,7 @@ class PaiementController extends Controller
 
         // Vérifier le statut de la transaction
         FedaPay::setApiKey(config('services.fedapay.secret_key'));
+        FedaPay::setEnvironment(config('services.fedapay.mode', 'sandbox'));
 
         try {
             $transaction = Transaction::retrieve($transactionId);
@@ -101,7 +110,8 @@ class PaiementController extends Controller
                 return redirect('/contenus')->with('error', 'Paiement échoué ou annulé.');
             }
         } catch (\Exception $e) {
-            return redirect('/contenus')->with('error', 'Erreur lors de la vérification du paiement.');
+            \Illuminate\Support\Facades\Log::error('FedaPay Payment Error: ' . $e->getMessage());
+            return redirect('/contenus')->with('error', 'Erreur lors de la vérification du paiement: ' . $e->getMessage());
         }
     }
 
