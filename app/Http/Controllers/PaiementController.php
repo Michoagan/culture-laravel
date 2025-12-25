@@ -61,6 +61,10 @@ class PaiementController extends Controller
             return redirect($token->url);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('FedaPay Init Error: ' . $e->getMessage());
+            if ($e instanceof \FedaPay\Error\Base) {
+                 \Illuminate\Support\Facades\Log::error('FedaPay Body: ' . json_encode($e->getHttpBody()));
+            }
             return back()->with('error', 'Erreur lors de l\'initialisation du paiement: ' . $e->getMessage());
         }
     }
