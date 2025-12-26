@@ -15,8 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
             'role' => \App\Http\Middleware\AdminMiddleware::class,
-            'role' => AdminMiddleware::class,
         ]);
+
+        // Trust proxies for Render/AWS (Fix Mixed Content)
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
