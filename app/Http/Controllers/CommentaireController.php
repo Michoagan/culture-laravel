@@ -34,7 +34,7 @@ class CommentaireController extends Controller
             'note' => $request->note,
             'id_contenu' => $request->id_contenu,
             'id_utilisateur' => Auth::id(),
-            'date' => now()
+            'date_commentaire' => now()
         ]);
 
         // Recharger les relations
