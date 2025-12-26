@@ -12,6 +12,9 @@ php artisan view:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Configuring Apache Port..."
+sed -i "s/80/${PORT:-80}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+
 echo "Starting Apache..."
 # Cette commande lance Apache en premier plan
 apache2-foreground
