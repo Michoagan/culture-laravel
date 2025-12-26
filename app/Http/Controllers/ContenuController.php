@@ -87,6 +87,25 @@ class ContenuController extends Controller
         return view('contenus.show', compact('contenu', 'userHasAccess'));
     }
 
+    private function checkUserAccess($contenu)
+    {
+        $user = auth()->user();
+
+        if (!$user) return false;
+
+        // Admin
+        if ($user->id_role === 1) return true;
+
+        // Auteur
+        if ($contenu->id_auteur === $user->id) return true;
+
+        // Contenu gratuit
+        if ($contenu->typeContenu && $contenu->typeContenu->gratuit) return true;
+
+        // Abonnement valide
+        return $user->abonnement_valide;
+    }
+
 
 
     public function edit(Contenu $contenu)

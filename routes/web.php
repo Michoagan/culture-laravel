@@ -43,6 +43,7 @@ Route::middleware(['auth', ])->group(function () {
 // ==================== ROUTES UTILISATEUR (role = 2) ====================
 Route::middleware(['auth', ])->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/contenus/{contenu}', [ContenuController::class, 'show'])->name('contenus.show');
 
     // Commentaires
     Route::post('/commentaires', [CommentaireController::class, 'store'])->name('commentaires.store');
@@ -68,7 +69,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/statsboard', [StatsboardController::class, 'index'])->name('statsboard');
 
     // Routes CRUD admin
-    Route::resource('contenus', ContenuController::class)->except(['index']);
+    // Routes CRUD admin (sauf show qui est accessible aux utilisateurs)
+    Route::resource('contenus', ContenuController::class)->except(['index', 'show']);
     Route::resource('regions', RegionController::class)->except(['index']);
     Route::resource('langues', LangueController::class)->except(['index']);
     Route::resource('users', UserController::class);
