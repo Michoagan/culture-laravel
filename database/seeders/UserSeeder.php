@@ -14,8 +14,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         $adminRole = Role::firstOrCreate(['nom' => 'Administrateur']);
-        $contributeurRole = Role::firstOrCreate(['nom' => 'Contributeur']);
-        $moderateurRole = Role::firstOrCreate(['nom' => 'Modérateur']);
+        $userRole = Role::firstOrCreate(['nom' => 'Utilisateur']);
 
         $users = [
             [
@@ -40,7 +39,7 @@ class UserSeeder extends Seeder
                 'statut' => 'Actif',
                 'photo' => 'default.png',
                 'id_langue' => Langue::where('code_langue', 'yor')->first()->id,
-                'id_role' => $moderateurRole->id,
+                'id_role' => $userRole->id,
             ],
             [
                 'nom' => 'Sègbo',
@@ -52,7 +51,7 @@ class UserSeeder extends Seeder
                 'statut' => 'Actif',
                 'photo' => 'default.png',
                 'id_langue' => Langue::where('code_langue', 'fon')->first()->id,
-                'id_role' => $contributeurRole->id,
+                'id_role' => $userRole->id,
             ],
             [
                 'nom' => 'Bakary',
@@ -64,7 +63,7 @@ class UserSeeder extends Seeder
                 'statut' => 'Actif',
                 'photo' => 'default.png',
                 'id_langue' => Langue::where('code_langue', 'bba')->first()->id,
-                'id_role' => $contributeurRole->id,
+                'id_role' => $userRole->id,
             ],
             [
                 'nom' => 'Tchibozo',
@@ -76,9 +75,8 @@ class UserSeeder extends Seeder
                 'statut' => 'Actif',
                 'photo' => 'default.png',
                 'id_langue' => Langue::where('code_langue', 'fon')->first()->id,
-                'id_role' => $contributeurRole->id,
+                'id_role' => $userRole->id,
             ],
-
             [
                 'nom' => 'Comlan',
                 'prenom' => 'Maurice',
@@ -94,7 +92,10 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            User::create($user);
+            User::firstOrCreate(
+                ['email' => $user['email']], 
+                $user
+            );
         }
     }
 }

@@ -17,7 +17,9 @@ class AdminMiddleware
         }
 
         // Vérifier si l'utilisateur est admin (id_role = 1)
-       
+        if (Auth::user()->id_role !== 1) {
+            abort(403, 'Accès interdit');
+        }
 
         return $next($request);
     }
