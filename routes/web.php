@@ -75,7 +75,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('langues', LangueController::class)->except(['index']);
     Route::resource('users', UserController::class);
     Route::resource('medias', MediaController::class);
-    Route::resource('commentaires', CommentaireController::class);
+    Route::resource('commentaires', CommentaireController::class)->except(['store']);
 });
 
 // ==================== REDIRECTION ====================
