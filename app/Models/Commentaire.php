@@ -10,13 +10,13 @@ class Commentaire extends Model
     protected $fillable = [
         'texte',
         'note',
-        'date',
+        'date_commentaire',
         'id_utilisateur',
         'id_contenu'
     ];
 
     protected $casts = [
-        'date' => 'datetime',
+        'date_commentaire' => 'datetime',
     ];
 
     // L'utilisateur qui a posté le commentaire
