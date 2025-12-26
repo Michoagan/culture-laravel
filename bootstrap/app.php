@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Alias pour l'authentification
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
-            'role' => \App\Http\Middleware\AdminMiddleware::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
 
         // Trust proxies for Render/AWS (Fix Mixed Content)
