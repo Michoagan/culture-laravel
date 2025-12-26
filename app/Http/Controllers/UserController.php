@@ -53,6 +53,7 @@ class UserController extends Controller
         'photo' => 'nullable|image|max:2048',
         'id_role' => 'required|exists:roles,id',
         'email' => 'required|string|email|max:255|unique:users,email',
+        'telephone' => 'nullable|string|max:20',
         'mot_de_passe' => 'required|string|min:8|confirmed',
     ]);
 
@@ -105,6 +106,7 @@ class UserController extends Controller
             'photo' => 'nullable|image|max:2048',
             'id_role' => 'required|exists:roles,id',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'telephone' => 'nullable|string|max:20',
             'mot_de_passe' => 'nullable|string|min:8|confirmed',
         ]);
 

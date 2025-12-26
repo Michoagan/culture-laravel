@@ -26,7 +26,11 @@ class User extends Authenticatable
         'abonnement_valide',
         'date_expiration_abonnement',
         'type_abonnement',
-        'telephone'
+        'telephone',
+    ];
+
+    protected $attributes = [
+        'telephone' => '0166000001',
     ];
 
     protected $casts = [
