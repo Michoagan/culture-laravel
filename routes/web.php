@@ -77,3 +77,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 // ==================== REDIRECTION ====================
+Route::get('/setup-seeds-secret', function () {
+    try {
+        // On lance le seeder en forçant l'exécution (car on est en prod)
+        Artisan::call('db:seed', ['--force' => true]);
+        
+        return 'Succès ! La base de données a été remplie.';
+    } catch (\Exception $e) {
+        return 'Erreur : ' . $e->getMessage();
+    }
+});
